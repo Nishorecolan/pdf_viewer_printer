@@ -1,0 +1,4 @@
+#Wed Dec 06 13:33:53 IST 2023
+base.0=/Users/nishore.saravanan/Documents/Flutter/Project examples/pdf_example 2/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
