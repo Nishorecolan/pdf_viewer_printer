@@ -40,6 +40,9 @@ dependencies:
   printing: ^5.11.0
   path_provider: ^2.1.1
   http:
+  draggable_home: ^1.0.5
+  pdfrx: ^1.0.83
+  flutter_pdfview: ^1.3.2
 
 dev_dependencies:
   flutter_test:
@@ -57,11 +60,14 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+    - assets/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

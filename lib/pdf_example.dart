@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf_example/main.dart';
-import 'package:printing/printing.dart';
+// import 'package:printing/printing.dart';
 import 'dart:typed_data';
 
 class PdfExample extends StatefulWidget {
@@ -43,49 +44,75 @@ class _PdfExampleState extends State<PdfExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios),onPressed: (){
+    return MaterialApp(
+        home:  Scaffold(
+          appBar: AppBar(
+            leading: IconButton(icon: const Icon(Icons.arrow_back_ios),onPressed: (){
 
-          SystemChrome.setSystemUIOverlayStyle(
-            SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent, // Status bar background color
-              statusBarIconBrightness: Brightness.dark, // Status bar icon color (light for white)
-            ),
-          );
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const MyHomePage()));
-        }),
-        title: const Text('PDF Viewer - POC'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.print),
-            onPressed: () {
-              printPdf();
-            },
+              SystemChrome.setSystemUIOverlayStyle(
+                SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent, // Status bar background color
+                  statusBarIconBrightness: Brightness.dark, // Status bar icon color (light for white)
+                ),
+              );
+              // Navigator.pushReplacement(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) =>  MyHomePage()));
+            }),
+            title: const Text('PDF Viewer - POC'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.print),
+                onPressed: () {
+                  printPdf();
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : PDFViewer(
-              document: document,
-              scrollDirection: Axis.vertical,
-              showPicker: false,
-              lazyLoad: true,
-            ),
-    );
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : PDFViewer(
+            document: document,
+            scrollDirection: Axis.vertical,
+            showPicker: false,
+            lazyLoad: true,
+          ),
+          //     : InteractiveViewer(
+          //   panEnabled: true,
+          //   boundaryMargin: EdgeInsets.all(20),
+          //   minScale: 0.5,
+          //   maxScale: 4.0,
+          //   child: PDFViewer(
+          //     document: document,
+          //     scrollDirection: Axis.vertical,
+          //     lazyLoad: true,
+          //      showPicker: false,
+          //     zoomSteps: 1, // Disable internal zoom handling of PDFViewer
+          //   ),
+          // ),
+        //         : PDFViewer(
+        // document: document,
+        // zoomSteps: 0, // Disable zoom functionality
+        // ),
+        ));
+
   }
 
   Future<void> printPdf() async {
     final pdfData = await fetchPdfBytes(pdfUrl);
-    await Printing.layoutPdf(onLayout: (format) async {
-      //return pdfData;
-      var bytes = base64Decode(base64String.replaceAll('\n', ''));
-      return bytes;
-    });
+    // await Printing.layoutPdf(onLayout: (format) async {
+    //   //return pdfData;
+    //   //var bytes = base64Decode(base64String.replaceAll('\n', ''));
+    //   var bytes = null;
+    //   return bytes;
+    // }); IconButton(
+    //             icon: const Icon(Icons.first_page),
+    //             onPressed: () => controller.goToPage(pageNumber: 1),
+    //           ), IconButton(
+    //             icon: const Icon(Icons.first_page),
+    //             onPressed: () => controller.goToPage(pageNumber: 1),
+    //           ),
   }
 
   Future<Uint8List> fetchPdfBytes(String url) async {

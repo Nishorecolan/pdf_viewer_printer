@@ -73,8 +73,8 @@ class _CountDownTimerState extends State<CountDownTimer>
         leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
             onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()));
+              // Navigator.pushReplacement(context,
+              //     MaterialPageRoute(builder: (context) => const MyHomePage()));
             }),
       ),
       body: AnimatedBuilder(
