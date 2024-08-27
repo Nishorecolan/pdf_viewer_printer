@@ -564,4 +564,38 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  Future<void> clearTemporaryDirectory() async {
+    try {
+      // Get the path of the temporary directory
+      final tempDir = await getTemporaryDirectory();
+      final tempDirPath = tempDir.path;
+
+      // Check if the directory exists
+      final directory = Directory(tempDirPath);
+      if (await directory.exists()) {
+        // List all files and directories within the temporary directory
+        final List<FileSystemEntity> entities = directory.listSync();
+
+        // Iterate through each entity and delete it
+        for (var entity in entities) {
+          try {
+            if (entity is File) {
+              await entity.delete();
+            } else if (entity is Directory) {
+              await entity.delete(recursive: true);
+            }
+          } catch (e) {
+            print('Error deleting file/directory: $e');
+          }
+        }
+
+        print('Temporary directory cleared successfully.');
+      } else {
+        print('Temporary directory not found.');
+      }
+    } catch (e) {
+      print('Error clearing temporary directory: $e');
+    }
+  }
+
 }
