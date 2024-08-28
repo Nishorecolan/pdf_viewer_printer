@@ -37,7 +37,8 @@ class _PdfExampleState extends State<PdfExample> {
     final output = await getTemporaryDirectory();
     final file = File("${output.path}/example.pdf");
     await file.writeAsBytes(bytes.buffer.asUint8List());
-    document = await PDFDocument.fromFile(file);
+   // document = await PDFDocument.fromFile(file);
+    document =  await PDFDocument.fromURL('https://www.ecma-international.org/wp-content/uploads/ECMA-262_12th_edition_june_2021.pdf');
 
     setState(() => isLoading = false);
   }
@@ -72,12 +73,15 @@ class _PdfExampleState extends State<PdfExample> {
           ),
           body: isLoading
               ? const Center(child: CircularProgressIndicator())
-              : PDFViewer(
+
+              : RepaintBoundary(
+              child:PDFViewer(
             document: document,
             scrollDirection: Axis.vertical,
-            showPicker: false,
+            showPicker: true,
             lazyLoad: true,
-          ),
+            zoomSteps: 1,
+          )),
           //     : InteractiveViewer(
           //   panEnabled: true,
           //   boundaryMargin: EdgeInsets.all(20),
