@@ -39,15 +39,15 @@ import 'package:internet_file/internet_file.dart';
 // }
 void main() {
   // Increase the maximum number of cached images
-  PaintingBinding.instance.imageCache.maximumSize = 2000; // Set to a higher value like 2000 images
+  //PaintingBinding.instance.imageCache.maximumSize = 2000; // Set to a higher value like 2000 images
 
   // Increase the maximum cache size in bytes
-  PaintingBinding.instance.imageCache.maximumSizeBytes = 100 * 1024 * 1024; // Set to 100MB
+  //PaintingBinding.instance.imageCache.maximumSizeBytes = 100 * 1024 * 1024; // Set to 100MB
 
 
  // runApp(MyAppPDF());
-  runApp(PdfExample());
-  // runApp(MyAppBG1());
+  //runApp(PdfExample());
+  runApp(MyAppBG1());
 }
 
 
@@ -652,9 +652,7 @@ class _PinchPageState extends State<PinchPage> {
   void initState() {
     _pdfControllerPinch = PdfControllerPinch(
       // document: PdfDocument.openAsset('assets/hello.pdf'),
-      document: pdfx.PdfDocument.openData(InternetFile.get('https://github.com/ScerIO/packages.flutter/raw/fd0c92ac83ee355255acb306251b1adfeb2f2fd6/packages/native_pdf_renderer/example/assets/sample.pdf')
-
-      ),
+      document: pdfx.PdfDocument.openData(InternetFile.get('https://www.ecma-international.org/wp-content/uploads/ECMA-262_12th_edition_june_2021.pdf')),
       initialPage: _initialPage,
     );
     super.initState();
