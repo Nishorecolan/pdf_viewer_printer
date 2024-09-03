@@ -8,8 +8,8 @@ import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf_example/main.dart';
-// import 'package:printing/printing.dart';
 import 'dart:typed_data';
+import 'package:printing/printing.dart';
 
 class PdfExample extends StatefulWidget {
   const PdfExample({super.key});
@@ -24,6 +24,16 @@ class _PdfExampleState extends State<PdfExample> {
   late PDFDocument document;
   bool isLoading = true;
   String fileName = 'example.pdf';
+  double _zoomLevel = 1.0;
+  TransformationController _transformationController = TransformationController();
+ late PageController _pageController;
+  double _currentScale = 1.0;
+  final double _minScale = 1.0;
+  final double _maxScale = 3.0;
+  int currentPage = 1;
+  int totalPages = 0;
+  final Duration animationDuration = Duration(milliseconds: 200);
+  final Curve animationCurve = Curves.easeIn;
 
   @override
   void initState() {
@@ -38,28 +48,41 @@ class _PdfExampleState extends State<PdfExample> {
     final file = File("${output.path}/example.pdf");
     await file.writeAsBytes(bytes.buffer.asUint8List());
    // document = await PDFDocument.fromFile(file);
-    document =  await PDFDocument.fromURL('https://www.ecma-international.org/wp-content/uploads/ECMA-262_12th_edition_june_2021.pdf');
-
+   document =  await PDFDocument.fromURL('https://www.ecma-international.org/wp-content/uploads/ECMA-262_12th_edition_june_2021.pdf');
+    totalPages = document.count;
+    _pageController =  PageController(
+      initialPage: currentPage - 1,
+    );
     setState(() => isLoading = false);
   }
 
+
+
+  void _zoomIn() {
+    setState(() {
+      _currentScale = (_currentScale + 0.1).clamp(_minScale, _maxScale);
+      _transformationController.value = Matrix4.identity()..scale(_currentScale);
+    });
+  }
+
+  void _zoomOut() {
+    setState(() {
+      _currentScale = (_currentScale - 0.1).clamp(_minScale, _maxScale);
+      _transformationController.value = Matrix4.identity()..scale(_currentScale);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home:  Scaffold(
           appBar: AppBar(
             leading: IconButton(icon: const Icon(Icons.arrow_back_ios),onPressed: (){
-
               SystemChrome.setSystemUIOverlayStyle(
                 SystemUiOverlayStyle(
                   statusBarColor: Colors.transparent, // Status bar background color
                   statusBarIconBrightness: Brightness.dark, // Status bar icon color (light for white)
                 ),
               );
-              // Navigator.pushReplacement(
-              //     context,
-              //     MaterialPageRoute(
-              //         builder: (context) =>  MyHomePage()));
             }),
             title: const Text('PDF Viewer - POC'),
             actions: [
@@ -71,52 +94,74 @@ class _PdfExampleState extends State<PdfExample> {
               ),
             ],
           ),
-          body: isLoading
-              ? const Center(child: CircularProgressIndicator())
+          body: Column(
+            children: [
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Expanded(
+                    child: InteractiveViewer(
+                      transformationController: _transformationController,
+                      minScale: _minScale,
+                      maxScale: _maxScale,
+                      child: PDFViewer(
+                                  document: document,
+                                  scrollDirection: Axis.vertical,
+                                  showPicker: false,
+                                  lazyLoad: true,
+                                //  enableSwipeNavigation: false,
+                                  showNavigation: false,
+                                  onZoomChanged:(currentZoom){
+                                            print('Current zoom level : $currentZoom');
+                                  },
+                                  onPageChanged: (page){
+                                    print('onPageChanged : $page');
+                                    setState(() {
+                                      currentPage = page+1;
+                                    });
+                          },
+                        controller:_pageController
+                      ),
+                    ),
+                  ),
 
-              : RepaintBoundary(
-              child:PDFViewer(
-            document: document,
-            scrollDirection: Axis.vertical,
-            showPicker: true,
-            lazyLoad: true,
-            zoomSteps: 1,
-          )),
-          //     : InteractiveViewer(
-          //   panEnabled: true,
-          //   boundaryMargin: EdgeInsets.all(20),
-          //   minScale: 0.5,
-          //   maxScale: 4.0,
-          //   child: PDFViewer(
-          //     document: document,
-          //     scrollDirection: Axis.vertical,
-          //     lazyLoad: true,
-          //      showPicker: false,
-          //     zoomSteps: 1, // Disable internal zoom handling of PDFViewer
-          //   ),
-          // ),
-        //         : PDFViewer(
-        // document: document,
-        // zoomSteps: 0, // Disable zoom functionality
-        // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.zoom_out),
+                    onPressed: _zoomOut,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.zoom_in),
+                    onPressed: _zoomIn,
+                  ),
+                ],
+              ),
+
+              CustomPDFNavigation(
+                currentPage: currentPage,
+                totalPages: totalPages,
+                onPageChanged: (page) {
+                  print('onPageChanged : $page');
+                  setPage(page);
+                },
+              ),
+            ],
+          ),
         ));
+
+
 
   }
 
   Future<void> printPdf() async {
     final pdfData = await fetchPdfBytes(pdfUrl);
-    // await Printing.layoutPdf(onLayout: (format) async {
-    //   //return pdfData;
-    //   //var bytes = base64Decode(base64String.replaceAll('\n', ''));
-    //   var bytes = null;
-    //   return bytes;
-    // }); IconButton(
-    //             icon: const Icon(Icons.first_page),
-    //             onPressed: () => controller.goToPage(pageNumber: 1),
-    //           ), IconButton(
-    //             icon: const Icon(Icons.first_page),
-    //             onPressed: () => controller.goToPage(pageNumber: 1),
-    //           ),
+    await Printing.layoutPdf(onLayout: (format) async {
+      //return pdfData;
+      //var bytes = base64Decode(base64String.replaceAll('\n', ''));
+      var bytes = null;
+      return bytes;
+    });
   }
 
   Future<Uint8List> fetchPdfBytes(String url) async {
@@ -128,4 +173,51 @@ class _PdfExampleState extends State<PdfExample> {
       throw Exception('Failed to load PDF');
     }
   }
+  void setPage(int page) {
+    setState(() {
+      currentPage = page;
+        _pageController.animateToPage(currentPage - 1,
+            duration: animationDuration, curve: animationCurve);
+    });
+  }
 }
+
+
+class CustomPDFNavigation extends StatelessWidget {
+  final int currentPage;
+  final int totalPages;
+  final ValueChanged<int> onPageChanged;
+
+  CustomPDFNavigation({
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPageChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            if (currentPage > 1) {
+              onPageChanged(currentPage - 1);
+            }
+          },
+        ),
+        Text('$currentPage / $totalPages'),
+        IconButton(
+          icon: Icon(Icons.arrow_forward_ios),
+          onPressed: () {
+            if (currentPage < totalPages) {
+              onPageChanged(currentPage + 1);
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
