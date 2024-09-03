@@ -71,6 +71,11 @@ class _PdfExampleState extends State<PdfExample> {
       _transformationController.value = Matrix4.identity()..scale(_currentScale);
     });
   }
+
+  void _resetZoom() {
+    _currentScale = (0.0).clamp(1.0, 3.0);
+   _transformationController.value = Matrix4.identity()..scale(_currentScale);
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -78,11 +83,12 @@ class _PdfExampleState extends State<PdfExample> {
           appBar: AppBar(
             leading: IconButton(icon: const Icon(Icons.arrow_back_ios),onPressed: (){
               SystemChrome.setSystemUIOverlayStyle(
-                SystemUiOverlayStyle(
+                const SystemUiOverlayStyle(
                   statusBarColor: Colors.transparent, // Status bar background color
                   statusBarIconBrightness: Brightness.dark, // Status bar icon color (light for white)
                 ),
               );
+              Navigator.pop(context);
             }),
             title: const Text('PDF Viewer - POC'),
             actions: [
@@ -176,6 +182,7 @@ class _PdfExampleState extends State<PdfExample> {
   void setPage(int page) {
     setState(() {
       currentPage = page;
+      _resetZoom();
         _pageController.animateToPage(currentPage - 1,
             duration: animationDuration, curve: animationCurve);
     });
