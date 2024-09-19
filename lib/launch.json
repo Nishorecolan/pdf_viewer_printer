@@ -1,0 +1,9 @@
+{
+    "name": "Adobe has",
+    "request": "launch",
+    "type": "dart",
+    "args": [
+        "--dart-define", "API_KEY=",
+        "--flavor", "dev"
+    ]
+}

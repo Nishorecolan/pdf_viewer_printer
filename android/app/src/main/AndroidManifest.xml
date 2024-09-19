@@ -34,5 +34,14 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+<!--        <meta-data-->
+
+        <meta-data
+            android:name="my.nyl.api.key"
+            android:value="${API_KEY}" />
+
+        <meta-data
+            android:name="my.nyl.client.id"
+            android:value="${MDL_CLIENT_ID}" />
     </application>
 </manifest>

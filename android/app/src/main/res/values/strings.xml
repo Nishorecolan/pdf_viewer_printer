@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nyl.api.key" translatable="false">${API_KEY}</string>
+    <string name="my.nyl.client.id" translatable="false">${MDL_CLIENT_ID}</string>
+
+
+</resources>
