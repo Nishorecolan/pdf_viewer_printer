@@ -8,7 +8,8 @@ import Flutter
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-  
+    let ADOBE_HASH_MDL = "1234567890-MDL"
+    let ADOBE_HASH_PROD = "1234567890-PROD"
     let dartDefinesString = Bundle.main.infoDictionary?["DART_DEFINES"] as? String
     var dartDefinesDictionary = [String: String]()
     if let dartDefinesString = dartDefinesString {
@@ -20,11 +21,8 @@ import Flutter
             }
         }
     }
-    let apiKey = dartDefinesDictionary["API_KEY"]
-      print(dartDefinesDictionary["API_KEY"]!);
-        showToastMessage(message: "From Native iOS :==> \(dartDefinesDictionary["MDL_CLIENT_ID"]!)")
-  //  showToastMessage(message: "From Native iOS :==> \(apiKey!)")
-  
+      showToastMessage(message: "HASH :==> \((dartDefinesDictionary["ENV"] == "MDL") ? ADOBE_HASH_MDL: ADOBE_HASH_PROD)")
+      print("HASH :==> \((dartDefinesDictionary["ENV"] == "MDL") ? ADOBE_HASH_MDL: ADOBE_HASH_PROD)");
     
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
